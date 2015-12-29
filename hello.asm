@@ -5,23 +5,32 @@
 bits 16
 org 0x100
 start:
+	; copy code segment address to data segment address
 	push cs
 	pop ds
+
+	; load start of video memory into es
 	push 0a000h
 	pop es
 		
+	; set video mode to 13h
 	mov ax,13h
 	int 10h
-	
+
+	; tell video card we're going to write to the palette at color 0
 	mov dx,3c8h
 	mov al,0
 	out dx,al
+
+	; update port address to palette data
 	inc dx
+
+	; write pallet data to port
 	mov cx,256*3
 	mov si,imagedata
+	rep outsb
 
-	rep outsb 
-	
+	; write image data to video memory
 	xor di,di
 	mov cx,(320*200)/2
 	rep movsw
