@@ -1,0 +1,47 @@
+CC=nasmw
+CFLAGS=-f bin
+
+FLOPPYNAME=goatsefloppy.img
+CDNAME=goatsefloppy.iso
+NETBOOTNAME=goatsefloppy.nb
+
+VOLUMENAME=GFLOPPY11
+
+.PHONY: cdrom floppy netboot
+
+all: floppy cdrom netboot
+
+cdrom: $(CDNAME)
+floppy: $(FLOPPYNAME)
+netboot: $(NETBOOTNAME)
+clean:
+	-del hello.com
+	-del hello.raw
+	-del hello.pal
+	-del $(FLOPPYNAME)
+	-del $(CDNAME)
+	-del $(NETBOOTNAME)
+	-del tools\convpic.exe
+	-rmdir /q /s garbage
+
+
+$(NETBOOTNAME): $(FLOPPYNAME)
+	-mknbi-dos --output=$(NETBOOTNAME) $(FLOPPYNAME) 
+
+$(CDNAME): $(FLOPPYNAME)
+	-mkdir garbage && mkdir garbage\boot && copy $(FLOPPYNAME) garbage\boot\boot.img && \
+	mkisofs -r -V $(VOLUMENAME) -b boot\boot.img -c boot\boot.cat -o $(CDNAME) garbage && \
+	rmdir /q /s garbage
+
+$(FLOPPYNAME): hello.com
+	$(CC) $(CFLAGS) floppy.asm -o $(FLOPPYNAME)
+
+hello.com: hello.asm hello.raw hello.pal
+	$(CC) $(CFLAGS) hello.asm -o hello.com
+
+hello.raw: tools\convpic.exe hello.jpg
+	tools\convpic hello.jpg hello.raw hello.pal
+
+tools\convpic.exe: tools\convpic.c
+	gcc tools\convpic.c -o tools\convpic.exe -O3 -s -Wall -ljpeg
+	

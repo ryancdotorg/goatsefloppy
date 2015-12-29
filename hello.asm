@@ -19,11 +19,8 @@ start:
 	inc dx
 	mov cx,256*3
 	mov si,imagedata
-setpal:	 
-	lodsb
-	shr al,2	; vga palette is 6-bit
-	out dx,al
-	loop setpal
+
+	rep outsb 
 	
 	xor di,di
 	mov cx,(320*200)/2
