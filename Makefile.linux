@@ -43,5 +43,5 @@ hello.raw: tools/convpic hello.jpg
 	tools/convpic hello.jpg hello.raw hello.pal
 
 tools/convpic: tools/convpic.c
-	gcc tools/convpic.c -o tools/convpic -O3 -s	-Wall -ljpeg
+	gcc tools/convpic.c -o tools/convpic -O3 -s	-Wall -lm -ljpeg
 	
